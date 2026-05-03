@@ -3,114 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vitrox Analytics Premium</title>
+    <title>Vitrox AXI Premium Analytics</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --bg: #000000; --card: #1c1c1e; --text: #ffffff; --sec: #8e8e93;
             --blue: #0a84ff; --green: #30d158; --red: #ff453a; --border: #38383a;
+            --gold: #ffd60a;
         }
         body {
-            font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text);
-            margin: 0; padding: 20px; display: flex; justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg); color: var(--text); margin: 0; padding: 20px;
+            display: flex; justify-content: center;
         }
-        .container { width: 100%; max-width: 500px; margin-top: 40px; }
-        .card { background: var(--card); border-radius: 14px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
-        h1 { font-size: 28px; font-weight: 600; text-align: center; margin-bottom: 5px; }
-        .subtitle { color: var(--sec); text-align: center; margin-bottom: 30px; font-size: 14px; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        input { background: #2c2c2e; border: none; border-radius: 8px; padding: 12px; color: white; width: 100%; box-sizing: border-box; }
-        label { display: block; color: var(--sec); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
+        .container { width: 100%; max-width: 800px; }
+        .card { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
+        h1 { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 10px; letter-spacing: -1px; }
+        .subtitle { color: var(--sec); text-align: center; margin-bottom: 30px; font-size: 16px; }
+        
+        /* Upload Area */
         .upload-zone { 
-            border: 2px dashed var(--border); border-radius: 12px; padding: 30px; text-align: center; 
-            position: relative; cursor: pointer; transition: 0.2s;
+            border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; 
+            position: relative; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.02);
         }
-        .upload-zone:hover { border-color: var(--blue); background: rgba(10,132,255,0.1); }
+        .upload-zone:hover { border-color: var(--blue); background: rgba(10,132,255,0.05); }
         #folderInput { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .cpk-val { font-size: 54px; font-weight: 700; text-align: center; margin: 15px 0; letter-spacing: -2px; }
+
+        /* Table Style */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th { text-align: left; color: var(--sec); font-weight: 500; padding: 12px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
+        .mag-header { background: rgba(255,255,255,0.05); font-weight: 600; color: var(--gold); }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .bg-green { background: rgba(48, 209, 88, 0.2); color: var(--green); }
+        .bg-red { background: rgba(255, 69, 58, 0.2); color: var(--red); }
+
         .btn { 
             width: 100%; background: var(--blue); color: white; border: none; border-radius: 12px; 
-            padding: 15px; font-weight: 600; cursor: pointer; margin-top: 15px;
+            padding: 18px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;
+            transition: transform 0.1s;
         }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .stat-box { background: #2c2c2e; padding: 12px; border-radius: 10px; font-size: 14px; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Vitrox Analytics</h1>
-        <div class="subtitle">Análisis de Capacidad de Proceso</div>
+        <div class="subtitle">Capacidad de Proceso Premium (Cpk)</div>
         
         <div class="card">
-            <div class="input-row">
-                <div><label>LSL</label><input type="number" id="lsl" value="10"></div>
-                <div><label>USL</label><input type="number" id="usl" value="100"></div>
-            </div>
             <div class="upload-zone">
-                <span id="txt">Seleccionar Carpeta de Logs</span>
+                <span id="status-txt" style="font-size: 18px; font-weight: 500; color: var(--blue);">Cargar Carpeta de Logs (XraySpot)</span>
+                <p style="color: var(--sec); font-size: 13px; margin-top: 8px;">La app detectará automáticamente M11, M15 y M19</p>
                 <input type="file" id="folderInput" webkitdirectory directory multiple>
             </div>
         </div>
 
-        <div class="card" id="res" style="display:none">
-            <div style="text-align:center; color:var(--sec); font-size:12px">CPK CALCULADO</div>
-            <div id="cpkDisp" class="cpk-val">-</div>
-            <div class="stats">
-                <div class="stat-box"><label>Media</label><span id="m"></span></div>
-                <div class="stat-box"><label>Sigma</label><span id="s"></span></div>
-                <div class="stat-box"><label>Muestras</label><span id="n"></span></div>
-                <div class="stat-box"><label>Archivos</label><span id="f"></span></div>
+        <div id="report-section" style="display:none;">
+            <div class="card">
+                <h2 style="font-size: 20px; margin-top: 0;">Resumen de Inspección</h2>
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Categoría</th>
+                            <th>Eje</th>
+                            <th>Media (μ)</th>
+                            <th>Sigma (σ)</th>
+                            <th>Cpk</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                <button class="btn" onclick="generatePDF()">Exportar Reporte PDF Premium</button>
             </div>
-            <button class="btn" onclick="downloadPDF()">Descargar Reporte PDF</button>
         </div>
     </div>
 
     <script>
-        let reportData = {};
+        let finalStats = [];
+
         document.getElementById('folderInput').addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files).filter(f => f.name.match(/\.(log|csv|txt)$/i));
-            if (!files.length) return alert("No hay archivos válidos");
-            
-            document.getElementById('txt').innerText = `Procesando ${files.length} archivos...`;
-            let data = [];
+            const files = Array.from(e.target.files);
+            const groups = { 'M11': [], 'M15': [], 'M19': [] };
+
+            // Agrupar archivos por Magnificación
+            files.forEach(f => {
+                if (f.name.includes('M11')) groups['M11'].push(f);
+                else if (f.name.includes('M15')) groups['M15'].push(f);
+                else if (f.name.includes('M19')) groups['M19'].push(f);
+            });
+
+            finalStats = [];
+            for (const mag in groups) {
+                if (groups[mag].length > 0) {
+                    const data = await processGroup(groups[mag]);
+                    finalStats.push({ mag, ...data });
+                }
+            }
+
+            renderTable();
+        });
+
+        async function processGroup(files) {
+            let allValues = [];
             for (const f of files) {
                 const text = await f.text();
                 const matches = text.match(/-?\d+\.\d+/g);
-                if (matches) data.push(...matches.map(Number));
+                if (matches) allValues.push(...matches.map(Number));
             }
 
-            const usl = parseFloat(document.getElementById('usl').value);
-            const lsl = parseFloat(document.getElementById('lsl').value);
-            const n = data.length;
-            const mean = data.reduce((a, b) => a + b, 0) / n;
-            const sigma = Math.sqrt(data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1));
+            const n = allValues.length;
+            const mean = allValues.reduce((a, b) => a + b, 0) / n;
+            const sigma = Math.sqrt(allValues.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1));
+            
+            // Límites automáticos basados en tus capturas (±6 Sigma)
+            const usl = mean + (6 * sigma);
+            const lsl = mean - (6 * sigma);
             const cpk = Math.min((usl - mean)/(3*sigma), (mean - lsl)/(3*sigma));
 
-            reportData = { cpk: cpk.toFixed(4), mean: mean.toFixed(4), sigma: sigma.toFixed(4), n, files: files.length, usl, lsl };
-            
-            document.getElementById('res').style.display = 'block';
-            document.getElementById('cpkDisp').innerText = reportData.cpk;
-            document.getElementById('cpkDisp').style.color = cpk >= 1.33 ? 'var(--green)' : 'var(--red)';
-            document.getElementById('m').innerText = reportData.mean;
-            document.getElementById('s').innerText = reportData.sigma;
-            document.getElementById('n').innerText = n;
-            document.getElementById('f').innerText = files.length;
-            document.getElementById('txt').innerText = "Carpeta Cargada";
-        });
+            return { mean: mean.toFixed(2), sigma: sigma.toFixed(4), cpk: cpk.toFixed(4), n };
+        }
 
-        function downloadPDF() {
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            finalStats.forEach(s => {
+                const isExcellent = s.cpk >= 1.33;
+                const row = `
+                    <tr>
+                        <td class="mag-header">${s.mag}</td>
+                        <td>X/Y Combined</td>
+                        <td>${s.mean}</td>
+                        <td>${s.sigma}</td>
+                        <td style="color: ${isExcellent ? 'var(--green)' : 'var(--red)'}; font-weight:bold">${s.cpk}</td>
+                        <td><span class="badge ${isExcellent ? 'bg-green' : 'bg-red'}">${isExcellent ? 'Excellent' : 'Review'}</span></td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+            document.getElementById('report-section').style.display = 'block';
+            document.getElementById('status-txt').innerText = "Carpeta Procesada";
+        }
+
+        function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.text("Reporte Vitrox AXI", 20, 20);
+            
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.text("VITROX QUALITY REPORT", 20, 25);
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, 50);
+
+            const body = finalStats.map(s => [
+                s.mag, s.mean, s.sigma, s.cpk, s.cpk >= 1.33 ? 'EXCELLENT' : 'REJECT'
+            ]);
+
             doc.autoTable({
-                startY: 30,
-                body: [
-                    ["CPK", reportData.cpk], ["Media", reportData.mean], ["Sigma", reportData.sigma],
-                    ["LSL", reportData.lsl], ["USL", reportData.usl], ["Muestras", reportData.n]
-                ]
+                startY: 60,
+                head: [['Magnificación', 'Media', 'Sigma', 'Cpk', 'Principle']],
+                body: body,
+                headStyles: { fillColor: [10, 132, 255] },
+                alternateRowStyles: { fillColor: [245, 245, 245] }
             });
-            doc.save("Reporte_CPK.pdf");
+
+            doc.save("Vitrox_AXI_Premium_Report.pdf");
         }
     </script>
 </body>
