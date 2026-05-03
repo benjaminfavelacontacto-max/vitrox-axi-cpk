@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vitrox AXI Premium Analytics</title>
+    <title>Vitrox Analytics Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --bg: #000000; --card: #1c1c1e; --text: #ffffff; --sec: #8e8e93;
             --blue: #0a84ff; --green: #30d158; --red: #ff453a; --border: #38383a;
-            --gold: #ffd60a;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -19,161 +18,155 @@
         }
         .container { width: 100%; max-width: 800px; }
         .card { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
-        h1 { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 10px; letter-spacing: -1px; }
-        .subtitle { color: var(--sec); text-align: center; margin-bottom: 30px; font-size: 16px; }
+        h1 { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 30px; letter-spacing: -1px; }
         
-        /* Upload Area */
         .upload-zone { 
-            border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; 
+            border: 2px dashed var(--border); border-radius: 12px; padding: 50px; text-align: center; 
             position: relative; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.02);
         }
         .upload-zone:hover { border-color: var(--blue); background: rgba(10,132,255,0.05); }
         #folderInput { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
-        /* Table Style */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th { text-align: left; color: var(--sec); font-weight: 500; padding: 12px; border-bottom: 1px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid var(--border); }
-        .mag-header { background: rgba(255,255,255,0.05); font-weight: 600; color: var(--gold); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: var(--sec); font-size: 12px; padding: 12px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .bg-green { background: rgba(48, 209, 88, 0.2); color: var(--green); }
-        .bg-red { background: rgba(255, 69, 58, 0.2); color: var(--red); }
+        .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .excellent { background: rgba(48, 209, 88, 0.2); color: var(--green); }
+        .fail { background: rgba(255, 69, 58, 0.2); color: var(--red); }
 
         .btn { 
             width: 100%; background: var(--blue); color: white; border: none; border-radius: 12px; 
             padding: 18px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;
-            transition: transform 0.1s;
         }
-        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Vitrox Analytics</h1>
-        <div class="subtitle">Capacidad de Proceso Premium (Cpk)</div>
         
         <div class="card">
             <div class="upload-zone">
-                <span id="status-txt" style="font-size: 18px; font-weight: 500; color: var(--blue);">Cargar Carpeta de Logs (XraySpot)</span>
-                <p style="color: var(--sec); font-size: 13px; margin-top: 8px;">La app detectará automáticamente M11, M15 y M19</p>
+                <span id="status-txt" style="font-size: 18px; color: var(--blue);">Cargar Carpeta "XraySpot"</span>
+                <p style="color: var(--sec); margin-top: 10px;">Selecciona la carpeta completa que contiene los archivos .log</p>
                 <input type="file" id="folderInput" webkitdirectory directory multiple>
             </div>
         </div>
 
-        <div id="report-section" style="display:none;">
+        <div id="reportView" style="display:none;">
             <div class="card">
-                <h2 style="font-size: 20px; margin-top: 0;">Resumen de Inspección</h2>
                 <table id="resultsTable">
                     <thead>
                         <tr>
-                            <th>Categoría</th>
-                            <th>Eje</th>
+                            <th>Magnificación</th>
+                            <th>Muestras</th>
                             <th>Media (μ)</th>
                             <th>Sigma (σ)</th>
                             <th>Cpk</th>
-                            <th>Estado</th>
+                            <th>Resultado</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
-                <button class="btn" onclick="generatePDF()">Exportar Reporte PDF Premium</button>
+                <button class="btn" onclick="downloadPDF()">Generar Reporte PDF</button>
             </div>
         </div>
     </div>
 
     <script>
-        let finalStats = [];
+        let reportData = [];
 
         document.getElementById('folderInput').addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files);
-            const groups = { 'M11': [], 'M15': [], 'M19': [] };
+            const files = Array.from(e.target.files).filter(f => f.name.endsWith('.log'));
+            if (files.length === 0) return alert("No se encontraron archivos .log");
 
-            // Agrupar archivos por Magnificación
+            // Agrupamos por tipo (M11, M15, M19)
+            const groups = { 'M11': [], 'M15': [], 'M19': [] };
             files.forEach(f => {
-                if (f.name.includes('M11')) groups['M11'].push(f);
+                if (f.name.includes('highMagXray')) groups['M11'].push(f);
                 else if (f.name.includes('M15')) groups['M15'].push(f);
                 else if (f.name.includes('M19')) groups['M19'].push(f);
             });
 
-            finalStats = [];
+            reportData = [];
             for (const mag in groups) {
                 if (groups[mag].length > 0) {
-                    const data = await processGroup(groups[mag]);
-                    finalStats.push({ mag, ...data });
+                    const stats = await processFiles(groups[mag]);
+                    if (stats) reportData.push({ mag, ...stats });
                 }
             }
 
-            renderTable();
+            renderResults();
         });
 
-        async function processGroup(files) {
-            let allValues = [];
+        async function processFiles(files) {
+            let values = [];
             for (const f of files) {
                 const text = await f.text();
-                const matches = text.match(/-?\d+\.\d+/g);
-                if (matches) allValues.push(...matches.map(Number));
+                // Buscamos específicamente los valores numéricos de las mediciones
+                const matches = text.match(/\d{8,10}\.\d+/g) || text.match(/\d{2,5}\.\d{3,}/g);
+                if (matches) values.push(...matches.map(Number));
             }
 
-            const n = allValues.length;
-            const mean = allValues.reduce((a, b) => a + b, 0) / n;
-            const sigma = Math.sqrt(allValues.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1));
+            if (values.length < 2) return null;
+
+            const n = values.length;
+            const mean = values.reduce((a, b) => a + b, 0) / n;
+            const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1);
+            const sigma = Math.sqrt(variance);
             
-            // Límites automáticos basados en tus capturas (±6 Sigma)
+            // Lógica USL/LSL de tu Excel
             const usl = mean + (6 * sigma);
             const lsl = mean - (6 * sigma);
             const cpk = Math.min((usl - mean)/(3*sigma), (mean - lsl)/(3*sigma));
 
-            return { mean: mean.toFixed(2), sigma: sigma.toFixed(4), cpk: cpk.toFixed(4), n };
+            return { n, mean: mean.toFixed(2), sigma: sigma.toFixed(4), cpk: cpk.toFixed(4) };
         }
 
-        function renderTable() {
+        function renderResults() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-            finalStats.forEach(s => {
-                const isExcellent = s.cpk >= 1.33;
-                const row = `
+            reportData.forEach(d => {
+                const isGood = d.cpk >= 1.33;
+                tbody.innerHTML += `
                     <tr>
-                        <td class="mag-header">${s.mag}</td>
-                        <td>X/Y Combined</td>
-                        <td>${s.mean}</td>
-                        <td>${s.sigma}</td>
-                        <td style="color: ${isExcellent ? 'var(--green)' : 'var(--red)'}; font-weight:bold">${s.cpk}</td>
-                        <td><span class="badge ${isExcellent ? 'bg-green' : 'bg-red'}">${isExcellent ? 'Excellent' : 'Review'}</span></td>
+                        <td>${d.mag}</td>
+                        <td>${d.n}</td>
+                        <td>${d.mean}</td>
+                        <td>${d.sigma}</td>
+                        <td style="color:${isGood ? 'var(--green)' : 'var(--red)'}; font-weight:bold">${d.cpk}</td>
+                        <td><span class="status-pill ${isGood ? 'excellent' : 'fail'}">${isGood ? 'EXCELENTE' : 'FALLA'}</span></td>
                     </tr>`;
-                tbody.innerHTML += row;
             });
-            document.getElementById('report-section').style.display = 'block';
-            document.getElementById('status-txt').innerText = "Carpeta Procesada";
+            document.getElementById('reportView').style.display = 'block';
+            document.getElementById('status-txt').innerText = "Análisis Completado";
         }
 
-        function generatePDF() {
+        function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
+            // Encabezado Negro
             doc.setFillColor(0, 0, 0);
             doc.rect(0, 0, 210, 40, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(22);
             doc.text("VITROX QUALITY REPORT", 20, 25);
             
-            doc.setTextColor(0, 0, 0);
+            doc.setTextColor(100, 100, 100);
             doc.setFontSize(10);
             doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, 50);
 
-            const body = finalStats.map(s => [
-                s.mag, s.mean, s.sigma, s.cpk, s.cpk >= 1.33 ? 'EXCELLENT' : 'REJECT'
-            ]);
-
+            const rows = reportData.map(d => [d.mag, d.mean, d.sigma, d.cpk, d.cpk >= 1.33 ? 'OPTIMAL' : 'BAD']);
+            
             doc.autoTable({
                 startY: 60,
                 head: [['Magnificación', 'Media', 'Sigma', 'Cpk', 'Principle']],
-                body: body,
-                headStyles: { fillColor: [10, 132, 255] },
-                alternateRowStyles: { fillColor: [245, 245, 245] }
+                body: rows,
+                headStyles: { fillColor: [10, 132, 255] }
             });
 
-            doc.save("Vitrox_AXI_Premium_Report.pdf");
+            doc.save("Vitrox_Report_Premium.pdf");
         }
     </script>
 </body>
