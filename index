@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculador CPK Vitrox</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input { margin-bottom: 10px; display: block; }
+        #result { margin-top: 20px; font-size: 1.5em; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>CPK Vitrox AXI</h1>
+        <label>Límite Superior (USL):</label>
+        <input type="number" id="usl" value="100">
+        <label>Límite Inferior (LSL):</label>
+        <input type="number" id="lsl" value="10">
+        <hr>
+        <p>Sube el archivo CSV de la Vitrox:</p>
+        <input type="file" id="fileInput" accept=".csv">
+        <div id="result">CPK: <span id="cpkValue">-</span></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
