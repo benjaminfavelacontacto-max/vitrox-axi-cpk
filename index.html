@@ -1,1082 +1,117 @@
-Gemini
-Crea App Web CPK con GitHub
-Logotipo de Enterprise
-Nueva conversación
-Mis cosas
-Gems
-
-Chief Investment AI
-
-Youtube
-Conversaciones
-Github Dashboard
-Conversación fijada
-Presupuestos: Totales de Gastos e Ingresos
-Conversación fijada
-Gestor de Deudas app
-Conversación fijada
-Guionista Experto YouTube Finanzas México
-Conversación fijada
-Crea App Web CPK con GitHub
-Exportar App para Testeo en Otra Mac
-Mejorar Interfaz de Aplicación Mac
-Subir Código HTML a Internet
-Barra vs. Botón para Crear Metas
-Use the uploaded image of the person as the main subject, keep the face and identity exactly the same, enhance facial expression to look surprised or shocked, add dramatic cinematic lighting and high contrast, clean dark background with glowing financial elements like declining graphs, money disappearing, and red arrows pointing down, add bold Spanish text “POR ESO NO TE ALCANZA” in large, high-contrast font, YouTube thumbnail style, ultra sharp, vibrant colors, 4k, professional composition
-Prompt para Video de Éxito Financiero
-Cinematic Montage: Financial Stress to Success
-Prompt para Video de B-roll Financiero
-Phone Banking Stress at Night
-Modern Lifestyle Expenses Montage
-Split Screen: Financial Dreams vs. Debt
-Ingeniero de soporte de Vitrox de malasia diciendo “Donde habre dejado mi pluma?”
-Comparar Portafolio Contra S&P 500
-Muestra esos niños ahora de adultos cansados de la vida laboral, agotados
-Imagen de menor y robot rechazada
-
-Configuración y ayuda
-Conversación con Gemini
-transforma esta app para una app en web para github donde pueda subir los archivos y que me genere el CPK
-
-Para transformar tu lógica de Swift (iOS/macOS) en una aplicación web que puedas alojar en GitHub (usando GitHub Pages), lo más eficiente es utilizar JavaScript (React o HTML/JS puro). Dado que GitHub Pages es un servidor de contenido estático, no puede ejecutar código Swift nativo, pero podemos replicar la lógica matemática del CPK en el navegador.
-
-Aquí tienes una propuesta para crear una herramienta web donde puedas subir archivos (CSV o JSON con los datos de Vitrox AXI) y calcular el CPK automáticamente.
-
-1. Estructura del Proyecto
-Para que funcione en GitHub, tu repositorio debe tener esta estructura básica:
-
-index.html: La interfaz de usuario.
-
-script.js: La lógica de cálculo del CPK.
-
-style.css: El diseño visual.
-
-2. El Corazón del Cálculo (script.js)
-El CPK (C 
-pk
-​
- ) mide la capacidad de un proceso. Necesitas las especificaciones: LSL (Límite Inferior), USL (Límite Superior), la Media (μ) y la Desviación Estándar (σ).
-
-C 
-pk
-​
- =min( 
-3σ
-USL−μ
-​
- , 
-3σ
-μ−LSL
-​
- )
-JavaScript
-function calcularCPK(datos, usl, lsl) {
-    const n = datos.length;
-    const media = datos.reduce((a, b) => a + b) / n;
-    
-    const varianza = datos.reduce((a, b) => a + Math.pow(b - media, 2), 0) / (n - 1);
-    const desviacionEstandar = Math.sqrt(varianza);
-
-    const cpu = (usl - media) / (3 * desviacionEstandar);
-    const cpl = (media - lsl) / (3 * desviacionEstandar);
-
-    return Math.min(cpu, cpl).toFixed(4);
-}
-3. Interfaz de Usuario (index.html)
-Puedes usar este código base para permitir la carga de archivos.
-
-HTML
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <title>Calculador CPK Vitrox AXI</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Analizador de Datos Vitrox AXI</h1>
-    
-    <div class="upload-section">
-        <label>Límite Superior (USL):</label>
-        <input type="number" id="usl" value="100">
-        
-        <label>Límite Inferior (LSL):</label>
-        <input type="number" id="lsl" value="10">
-        
-        <hr>
-        <p>Sube tu reporte de inspección (CSV):</p>
-        <input type="file" id="fileInput" accept=".csv">
-    </div>
-
-    <div id="result">
-        <h2>Resultado CPK: <span id="cpkValue">-</span></h2>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-4. Pasos para subirlo a GitHub
-Crea un repositorio en GitHub llamado Vitrox-CPK-Web.
-
-Sube tus archivos (index.html, script.js, style.css).
-
-Activa GitHub Pages:
-
-Ve a Settings (Configuración) de tu repositorio.
-
-En el menú izquierdo, busca Pages.
-
-En "Build and deployment", selecciona la rama main y guarda.
-
-¡Listo! En unos minutos, GitHub te dará una URL (ej. https://tu-usuario.github.io/Vitrox-CPK-Web/) donde podrás entrar desde cualquier navegador.
-
-¿Cómo procesar los archivos de Vitrox?
-Los equipos AXI de Vitrox suelen exportar archivos en formatos específicos. Para que tu app web sea útil, en el script.js deberás añadir un "Parser":
-
-Si es CSV: Usa la API de FileReader de JavaScript para leer las columnas de mediciones.
-
-Recomendación: Si los datos son masivos, te sugiero usar una librería llamada PapaParse, que es excelente para manejar archivos CSV grandes en el navegador sin trabar la página.
-
-¿Te gustaría que te ayude a escribir el código específico para leer las columnas de un archivo CSV de Vitrox? Solo necesitaría saber qué nombre tiene la columna de los datos (ej. "Value", "Measurement", etc.).
-
-COMO IMPLEMENTO ESTO? script.js: La lógica de cálculo del CPK.
-
-Para implementar el archivo script.js, necesitamos conectar la interfaz de usuario con una lógica que procese archivos CSV (comunes en reportes de Vitrox AXI), extraiga los números y aplique la fórmula estadística.
-
-Aquí tienes el código completo y listo para copiar en tu archivo script.js:
-
-Código Completo: script.js
-JavaScript
-// Esperar a que el usuario cargue un archivo
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        const contenido = e.target.result;
-        procesarDatos(contenido);
-    };
-
-    reader.readAsText(file);
-});
-
-function procesarDatos(csvText) {
-    // 1. Obtener límites de los inputs
-    const usl = parseFloat(document.getElementById('usl').value);
-    const lsl = parseFloat(document.getElementById('lsl').value);
-
-    // 2. Convertir CSV a un arreglo de números
-    // Nota: Ajusta el delimitador si tu archivo usa ";" en lugar de ","
-    const lineas = csvText.split(/\r?\n/);
-    let datos = [];
-
-    lineas.forEach(linea => {
-        const valor = parseFloat(linea.trim());
-        if (!isNaN(valor)) {
-            datos.push(valor);
-        }
-    });
-
-    if (datos.length < 2) {
-        alert("No se encontraron suficientes datos numéricos en el archivo.");
-        return;
-    }
-
-    // 3. Cálculos Estadísticos
-    const n = datos.length;
-    const media = datos.reduce((a, b) => a + b, 0) / n;
-    
-    const sumaCuadrados = datos.reduce((a, b) => a + Math.pow(b - media, 2), 0);
-    const desviacionEstandar = Math.sqrt(sumaCuadrados / (n - 1));
-
-    // 4. Cálculo de CPK
-    // Formula: Cpk = min( (USL - media)/(3*sigma), (media - LSL)/(3*sigma) )
-    const cpu = (usl - media) / (3 * desviacionEstandar);
-    const cpl = (media - lsl) / (3 * desviacionEstandar);
-    const cpk = Math.min(cpu, cpl);
-
-    // 5. Mostrar resultados en el HTML
-    document.getElementById('cpkValue').innerText = cpk.toFixed(4);
-    
-    // Feedback visual según el valor de CPK
-    const resultadoTexto = document.getElementById('cpkValue');
-    if (cpk < 1.33) {
-        resultadoTexto.style.color = "red"; // Proceso no capaz
-    } else {
-        resultadoTexto.style.color = "green"; // Proceso capaz
-    }
-}
-¿Qué hace exactamente este código?
-FileReader: Escucha cuando seleccionas un archivo en tu navegador. Lee el archivo como texto plano sin necesidad de un servidor (todo ocurre en la computadora del usuario).
-
-Limpieza de Datos: El código recorre cada línea del archivo, ignora encabezados o texto, y se queda solo con los valores numéricos.
-
-Lógica Matemática:
-
-Calcula la Media sumando todo y dividiendo por N.
-
-Calcula la Desviación Estándar Muestral (usando N−1 para mayor precisión en procesos industriales).
-
-Calcula los índices superior (C 
-pu
-​
- ) e inferior (C 
-pl
-​
- ).
-
-Inyección en el DOM: Actualiza el <span> con ID cpkValue que pusimos en el HTML anterior.
-
-Consejos para Vitrox AXI
-Si los archivos de Vitrox tienen muchas columnas, la línea const valor = parseFloat(linea.trim()); podría fallar. En ese caso, deberás indicar qué columna leer. Por ejemplo, si los datos están en la segunda columna:
-
-JavaScript
-// Si el CSV tiene columnas separadas por coma
-const columnas = linea.split(','); 
-const valor = parseFloat(columnas[1]); // [1] es la segunda columna
-¿El archivo que descargas de la Vitrox viene con una columna específica para las mediciones o es una lista simple de valores?
-
-PERO COMO HAGO ESO EN GITHUB DAME EL PASO A PASO
-
-Para implementar esto en GitHub y que funcione como una aplicación web real (GitHub Pages), sigue este paso a paso detallado:
-
-Paso 1: Crear el Repositorio en GitHub
-Inicia sesión en tu cuenta de GitHub.
-
-Haz clic en el botón "+" (arriba a la derecha) y selecciona New repository.
-
-Repository name: Ponle un nombre como vitrox-axi-cpk.
-
-Public/Private: Asegúrate de que sea Public (para usar GitHub Pages gratis).
-
-Marca la casilla Add a README file.
-
-Haz clic en Create repository.
-
-Paso 2: Crear los Archivos de la App
-Dentro de tu nuevo repositorio, crearás 3 archivos principales usando el botón Add file > Create new file:
-
-1. index.html (La estructura)
-Copia y pega este código. Es la cara de tu app:
-
-HTML
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Calculador CPK Vitrox</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 8px; shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input { margin-bottom: 10px; display: block; }
-        #result { margin-top: 20px; font-size: 1.5em; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>CPK Vitrox AXI</h1>
-        <label>Límite Superior (USL):</label>
-        <input type="number" id="usl" value="100">
-        <label>Límite Inferior (LSL):</label>
-        <input type="number" id="lsl" value="10">
-        <hr>
-        <p>Sube el archivo CSV de la Vitrox:</p>
-        <input type="file" id="fileInput" accept=".csv">
-        <div id="result">CPK: <span id="cpkValue">-</span></div>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>
-2. script.js (La lógica)
-Crea este archivo y pega la lógica de cálculo:
-
-JavaScript
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    const usl = parseFloat(document.getElementById('usl').value);
-    const lsl = parseFloat(document.getElementById('lsl').value);
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const lineas = e.target.result.split(/\r?\n/);
-        let datos = lineas.map(l => parseFloat(l.trim())).filter(n => !isNaN(n));
-
-        if (datos.length < 2) return alert("Datos insuficientes");
-
-        const media = datos.reduce((a, b) => a + b, 0) / datos.length;
-        const varianza = datos.reduce((a, b) => a + Math.pow(b - media, 2), 0) / (datos.length - 1);
-        const sigma = Math.sqrt(varianza);
-
-        const cpk = Math.min((usl - media)/(3*sigma), (media - lsl)/(3*sigma));
-        document.getElementById('cpkValue').innerText = cpk.toFixed(4);
-    };
-    reader.readAsText(file);
-});
-Paso 3: Activar la Aplicación (GitHub Pages)
-Una vez que tengas los archivos en tu repositorio:
-
-Ve a la pestaña Settings (Configuración) de tu repositorio.
-
-En el menú de la izquierda, haz clic en Pages.
-
-En la sección Build and deployment > Branch:
-
-Asegúrate de que esté seleccionada la rama main (o master).
-
-Asegúrate de que la carpeta seleccionada sea / (root).
-
-Haz clic en el botón Save.
-
-Paso 4: Ver tu App en vivo
-Espera aproximadamente 1 o 2 minutos.
-
-Refresca la página de Settings > Pages.
-
-Aparecerá un cuadro arriba que dice: "Your site is live at..." seguido de una dirección URL (ej: https://tu-usuario.github.io/vitrox-axi-cpk/).
-
-Haz clic en ese enlace y ¡listo! Ya puedes subir archivos desde cualquier dispositivo con internet.
-
-Tip Pro para Vitrox:
-Si el CSV de Vitrox tiene muchas columnas y los datos están en una columna específica (por ejemplo, la columna 3), cambia la línea del script.js por:
-let datos = lineas.map(l => parseFloat(l.split(',')[2])).filter(n => !isNaN(n)); (Donde [2] es la tercera columna).
-
-Ese error 404 File Not Found es el "bautizo" clásico de todo desarrollador en GitHub Pages. No te preocupes, significa que el servidor de GitHub ya activó tu sitio, pero no encuentra el archivo principal para mostrar.
-
-Aquí están las 3 razones más comunes y cómo solucionarlas rápido:
-
-1. Revisa el nombre del archivo (Sensibilidad a mayúsculas)
-GitHub es extremadamente estricto con los nombres.
-
-El error: Tu archivo se llama Index.html o INDEX.HTML.
-
-La solución: Debe ser estrictamente index.html (todo en minúsculas). Si está mal, cámbiale el nombre en el repositorio.
-
-2. El archivo no está en la "Raíz" (Root)
-El error: Creaste una carpeta (por ejemplo, una llamada codigo) y metiste el index.html ahí dentro.
-
-La solución: El archivo index.html debe estar afuera de cualquier carpeta, en la página principal de tu repositorio. GitHub Pages busca el archivo de entrada justo en el "primer nivel".
-
-3. Tiempo de propagación (El factor paciencia)
-El diagnóstico: A veces GitHub dice que el sitio está "Live", pero sus servidores internos tardan un par de minutos más en mover los archivos.
-
-La solución: Espera 2 minutos y presiona CMD + Shift + R (Mac) o Ctrl + F5 (Windows) para forzar la actualización del navegador sin usar el caché.
-
-¿Cómo verificar si el archivo existe?
-En la barra de direcciones de tu navegador, añade el nombre del archivo al final de la URL, por ejemplo:
-https://tu-usuario.github.io/vitrox-axi-cpk/index.html
-
-Si ahí sí carga, entonces es que GitHub no reconoce tu index.html como la página principal por defecto (revisa el punto 1).
-
-¿Me confirmas si el archivo en tu lista de archivos de GitHub aparece exactamente como index.html?
-
-necesito que lea .log files
-
-¡Excelente! Ya veo el formato. Los archivos .log de los equipos de Rayos X (como Vitrox o similares) suelen ser archivos de texto plano, pero con mucha "paja" o metadatos antes de llegar a los valores reales.
-
-Para que tu app lea esos .log, necesitamos actualizar el script.js para que busque números específicos dentro de ese desorden.
-
-1. Actualiza tu index.html
-Cambia la línea del input para que acepte archivos .log:
-
-HTML
-<input type="file" id="fileInput" accept=".log,.csv,.txt">
-2. Actualiza tu script.js (Lógica para archivos .log)
-Este nuevo código es más robusto: utiliza una Expresión Regular para extraer todos los números que encuentre en el archivo, ignorando el texto del sistema.
-
-JavaScript
-document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    const usl = parseFloat(document.getElementById('usl').value);
-    const lsl = parseFloat(document.getElementById('lsl').value);
-
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const texto = e.target.result;
-        
-        // Esta línea busca números (incluyendo decimales) en todo el archivo .log
-        // Si tus datos están en una columna específica, avísame para filtrar mejor.
-        let coincidencias = texto.match(/-?\d+(\.\d+)?/g); 
-        
-        if (!coincidencias) {
-            alert("No se encontraron datos numéricos en el archivo .log");
-            return;
-        }
-
-        let datos = coincidencias.map(Number).filter(n => !isNaN(n));
-
-        // --- CÁLCULOS ESTADÍSTICOS ---
-        const n = datos.length;
-        const media = datos.reduce((a, b) => a + b, 0) / n;
-        const varianza = datos.reduce((a, b) => a + Math.pow(b - media, 2), 0) / (n - 1);
-        const sigma = Math.sqrt(varianza);
-
-        if (sigma === 0) {
-            document.getElementById('cpkValue').innerText = "Sigma es 0 (datos constantes)";
-            return;
-        }
-
-        const cpu = (usl - media) / (3 * sigma);
-        const cpl = (media - lsl) / (3 * sigma);
-        const cpk = Math.min(cpu, cpl);
-
-        // Mostrar resultado
-        const el = document.getElementById('cpkValue');
-        el.innerText = cpk.toFixed(4);
-        el.style.color = cpk < 1.33 ? "red" : "green";
-        
-        console.log("Datos procesados:", n); // Para que revises en la consola si leyó bien la cantidad de datos
-    };
-    reader.readAsText(file);
-});
-3. El problema del "Ruido" en los .log
-Los archivos .log de X-Ray a veces incluyen la fecha, la hora o el ID del panel (ej. 2026-05-02, 18:25). El código de arriba podría intentar promediar esos números también.
-
-Para que sea perfecto:
-¿Podrías abrir uno de esos archivos .log en el Bloc de Notas y pegarme aquí las primeras 10 líneas? Así puedo ver si los datos reales vienen después de una palabra clave como "Measurement:" o "Result:" y hacer que el script solo lea esos.
-
-¿Cómo actualizarlo en GitHub?
-Ve a tu repositorio.
-
-Haz clic en script.js.
-
-Dale al icono del lápiz (Edit).
-
-Borra todo, pega el código nuevo y dale a Commit changes.
-
-Espera 1 minuto y recarga tu página web.
-
-dame el html completp
-
-Aquí tienes el código HTML completo (que incluye el CSS y el JavaScript en un solo archivo) optimizado para leer los archivos .log de los equipos Vitrox/X-Ray.
-
-Este diseño es responsivo, profesional y ya incluye la lógica para extraer automáticamente los números decimales de los logs, ignorando fechas y texto del sistema.
-
-Instrucciones para GitHub:
-En tu repositorio, borra los archivos anteriores (o edítalos).
-
-Crea un solo archivo llamado index.html.
-
-Pega todo el código que aparece a continuación.
-
-Si usas un solo archivo index.html, ya no necesitas el script.js separado, ya que la lógica va incluida dentro de la etiqueta <script>.
-
-HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPK Analizador Vitrox AXI</title>
-    <style>
-        /* ESTILO PROFESIONAL */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-        }
-
-        h1 {
-            color: #1a73e8;
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 2px solid #e8f0fe;
-            padding-bottom: 10px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        input[type="number"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .results-card {
-            margin-top: 25px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-
-        #cpkValue {
-            font-size: 48px;
-            font-weight: bold;
-            display: block;
-            margin: 10px 0;
-            color: #1a73e8;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-
-        .stat-item {
-            background: white;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #eee;
-        }
-
-        .footer-note {
-            font-size: 11px;
-            color: #999;
-            margin-top: 20px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>CPK Vitrox AXI (Log Reader)</h1>
-    
-    <div class="input-group">
-        <label for="usl">Límite Superior (USL):</label>
-        <input type="number" id="usl" value="100" step="0.001">
-    </div>
-
-    <div class="input-group">
-        <label for="lsl">Límite Inferior (LSL):</label>
-        <input type="number" id="lsl" value="10" step="0.001">
-    </div>
-
-    <div class="input-group">
-        <label for="fileInput">Seleccionar archivo .log o .csv:</label>
-        <input type="file" id="fileInput" accept=".log,.csv,.txt">
-    </div>
-
-    <div class="results-card">
-        <span style="color:#666">Resultado CPK</span>
-        <span id="cpkValue">-</span>
-        
-        <div class="stats-grid">
-            <div class="stat-item">Media: <span id="meanVal">0</span></div>
-            <div class="stat-item">Sigma (σ): <span id="sigmaVal">0</span></div>
-            <div class="stat-item">N (Datos): <span id="nVal">0</span></div>
-            <div class="stat-item">Estado: <span id="statusVal">-</span></div>
-        </div>
-    </div>
-
-    <p class="footer-note">Lógica optimizada para extraer valores decimales de logs de inspección.</p>
-</div>
-
-<script>
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const usl = parseFloat(document.getElementById('usl').value);
-        const lsl = parseFloat(document.getElementById('lsl').value);
-
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const content = e.target.result;
-            const lines = content.split(/\r?\n/);
-            let rawData = [];
-
-            // Lógica de extracción: Busca números decimales (ej. 12.345) 
-            // Esto suele ser el formato de las mediciones en los logs de Vitrox.
-            lines.forEach(line => {
-                const matches = line.match(/-?\d+\.\d+/g); 
-                if (matches) {
-                    matches.forEach(m => rawData.push(parseFloat(m)));
-                }
-            });
-
-            if (rawData.length < 2) {
-                alert("Error: No se encontraron suficientes datos numéricos decimales en el archivo.");
-                return;
-            }
-
-            // Cálculos
-            const n = rawData.length;
-            const mean = rawData.reduce((a, b) => a + b, 0) / n;
-            const variance = rawData.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1);
-            const sigma = Math.sqrt(variance);
-
-            const cpu = (usl - mean) / (3 * sigma);
-            const cpl = (mean - lsl) / (3 * sigma);
-            const cpk = Math.min(cpu, cpl);
-
-            // Actualizar Interfaz
-            const cpkElem = document.getElementById('cpkValue');
-            cpkElem.innerText = isFinite(cpk) ? cpk.toFixed(4) : "Error";
-            
-            const passColor = "#28a745";
-            const failColor = "#dc3545";
-            const color = cpk >= 1.33 ? passColor : failColor;
-
-            cpkElem.style.color = color;
-            document.getElementById('meanVal').innerText = mean.toFixed(3);
-            document.getElementById('sigmaVal').innerText = sigma.toFixed(4);
-            document.getElementById('nVal').innerText = n;
-            document.getElementById('statusVal').innerText = cpk >= 1.33 ? "PASSED" : "FAILED";
-            document.getElementById('statusVal').style.color = color;
-        };
-        reader.readAsText(file);
-    });
-</script>
-
-</body>
-</html>
-También he guardado una copia de este código en tu Google Drive por si necesitas consultarlo más tarde:
-
-CPK_Vitrox_Web_Index_HTML
-Icono de Documentos de Google
- CPK_Vitrox...Index_HTML 
-Documentos de Google
-
-1-que me permita agregar la carpeta completa que contenga todos los logs
-
-2-Cambia la interface para que sea como una app de apple premium con dark mode
-
-3-Dame la opción para descargar el reporte en pdf
-
-Aquí tienes la versión evolucionada de tu aplicación. He implementado un diseño de alto impacto inspirado en el lenguaje visual de Apple (Dark Mode, tipografía SF y bordes suavizados) y he añadido las funcionalidades avanzadas que solicitaste.
-
-Tu nuevo archivo HTML está listo para ser descargado y subido a tu repositorio de GitHub:
-Icono de HTML
- index-v2 
-HTML
-
-Mejoras Implementadas:
-Carga de Carpetas Completas: * He añadido el atributo webkitdirectory al selector de archivos. Al hacer clic en la zona de carga, podrás seleccionar una carpeta completa (como la carpeta XraySpot de tu captura) y la app procesará automáticamente todos los archivos .log y .csv que encuentre dentro de ella.
-
-Interfaz Premium Apple (Dark Mode):
-
-Paleta de colores: Fondo negro profundo (#000000), tarjetas en gris oscuro (#1c1c1e) y acentos en azul eléctrico y verde neón.
-
-Tipografía: Uso de fuentes del sistema de Apple para una sensación nativa.
-
-Feedback visual: El valor del CPK cambia de color dinámicamente (verde si es ≥1.33, rojo si es menor) y muestra un "Badge" de estado.
-
-Reporte PDF Profesional:
-
-He integrado la librería jsPDF. Al terminar el análisis, aparecerá un botón azul para generar un reporte PDF limpio y estructurado con todos los estadísticos (Media, Sigma, N, Límites) y el resultado final.
-
-Cómo actualizar tu GitHub:
-Descarga el archivo index-v2.html que generé arriba.
-
-En tu repositorio de GitHub, borra el archivo index.html viejo.
-
-Sube este nuevo archivo y renómbralo a index.html (para que GitHub Pages lo reconozca como la página principal).
-
-Nota: Como ahora todo está en un solo archivo (estilos y lógica), ya no necesitas el archivo script.js ni el style.css por separado.
-
-
-
-
-
-Tus conversaciones de SMTO Engineering SA de CV no se usan para mejorar nuestros modelos. Gemini es una IA y puede cometer errores. Tu privacidad y GeminiSe abre en una ventana nueva
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vitrox CPK Premium</title>
-    <!-- Incluir JSPDF para el reporte -->
+    <title>Vitrox Analytics Premium</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
-            --bg-color: #000000;
-            --card-bg: #1c1c1e;
-            --text-main: #ffffff;
-            --text-secondary: #8e8e93;
-            --accent-blue: #0a84ff;
-            --accent-green: #30d158;
-            --accent-red: #ff453a;
-            --border-color: #38383a;
+            --bg: #000000; --card: #1c1c1e; --text: #ffffff; --sec: #8e8e93;
+            --blue: #0a84ff; --green: #30d158; --red: #ff453a; --border: #38383a;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
+            font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text);
+            margin: 0; padding: 20px; display: flex; justify-content: center;
         }
-
-        .app-container {
-            width: 100%;
-            max-width: 600px;
-            margin-top: 40px;
+        .container { width: 100%; max-width: 500px; margin-top: 40px; }
+        .card { background: var(--card); border-radius: 14px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); }
+        h1 { font-size: 28px; font-weight: 600; text-align: center; margin-bottom: 5px; }
+        .subtitle { color: var(--sec); text-align: center; margin-bottom: 30px; font-size: 14px; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        input { background: #2c2c2e; border: none; border-radius: 8px; padding: 12px; color: white; width: 100%; box-sizing: border-box; }
+        label { display: block; color: var(--sec); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
+        .upload-zone { 
+            border: 2px dashed var(--border); border-radius: 12px; padding: 30px; text-align: center; 
+            position: relative; cursor: pointer; transition: 0.2s;
         }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
+        .upload-zone:hover { border-color: var(--blue); background: rgba(10,132,255,0.1); }
+        #folderInput { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .cpk-val { font-size: 54px; font-weight: 700; text-align: center; margin: 15px 0; letter-spacing: -2px; }
+        .btn { 
+            width: 100%; background: var(--blue); color: white; border: none; border-radius: 12px; 
+            padding: 15px; font-weight: 600; cursor: pointer; margin-top: 15px;
         }
-
-        h1 {
-            font-weight: 600;
-            font-size: 34px;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 17px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .input-group label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 13px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            background: #2c2c2e;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            color: white;
-            font-size: 17px;
-            outline: none;
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .upload-zone:hover {
-            border-color: var(--accent-blue);
-            background: rgba(10, 132, 255, 0.05);
-        }
-
-        .upload-zone p {
-            margin: 0;
-            color: var(--accent-blue);
-            font-size: 17px;
-            font-weight: 500;
-        }
-
-        #folderInput {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .stats-hero {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .cpk-value {
-            font-size: 64px;
-            font-weight: 700;
-            margin: 10px 0;
-            letter-spacing: -2px;
-        }
-
-        .grid-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .info-box {
-            background: #2c2c2e;
-            padding: 16px;
-            border-radius: 10px;
-            text-align: left;
-        }
-
-        .info-label {
-            color: var(--text-secondary);
-            font-size: 12px;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .info-val {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        button.btn-primary {
-            width: 100%;
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 17px;
-            font-weight: 600;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        button.btn-primary:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-box { background: #2c2c2e; padding: 12px; border-radius: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <header>
+    <div class="container">
         <h1>Vitrox Analytics</h1>
-        <p class="subtitle">Análisis de Capacidad de Proceso Premium</p>
-    </header>
-
-    <div class="card">
-        <div class="input-row">
-            <div class="input-group">
-                <label>Límite LSL</label>
-                <input type="number" id="lsl" value="10" step="0.1">
+        <div class="subtitle">Análisis de Capacidad de Proceso</div>
+        
+        <div class="card">
+            <div class="input-row">
+                <div><label>LSL</label><input type="number" id="lsl" value="10"></div>
+                <div><label>USL</label><input type="number" id="usl" value="100"></div>
             </div>
-            <div class="input-group">
-                <label>Límite USL</label>
-                <input type="number" id="usl" value="100" step="0.1">
+            <div class="upload-zone">
+                <span id="txt">Seleccionar Carpeta de Logs</span>
+                <input type="file" id="folderInput" webkitdirectory directory multiple>
             </div>
         </div>
 
-        <div class="upload-zone" id="dropZone">
-            <p id="uploadText">Seleccionar carpeta de Logs</p>
-            <!-- Atributo webkitdirectory permite subir carpetas -->
-            <input type="file" id="folderInput" webkitdirectory mozdirectory directory multiple>
+        <div class="card" id="res" style="display:none">
+            <div style="text-align:center; color:var(--sec); font-size:12px">CPK CALCULADO</div>
+            <div id="cpkDisp" class="cpk-val">-</div>
+            <div class="stats">
+                <div class="stat-box"><label>Media</label><span id="m"></span></div>
+                <div class="stat-box"><label>Sigma</label><span id="s"></span></div>
+                <div class="stat-box"><label>Muestras</label><span id="n"></span></div>
+                <div class="stat-box"><label>Archivos</label><span id="f"></span></div>
+            </div>
+            <button class="btn" onclick="downloadPDF()">Descargar Reporte PDF</button>
         </div>
     </div>
 
-    <div class="card" id="resultsCard" style="display: none;">
-        <div class="stats-hero">
-            <span class="info-label">ÍNDICE CPK CALCULADO</span>
-            <div id="cpkDisplay" class="cpk-value">-</div>
-            <div id="statusBadge" class="status-badge">-</div>
-        </div>
-
-        <div class="grid-info">
-            <div class="info-box">
-                <span class="info-label">MEDIA (μ)</span>
-                <span id="meanVal" class="info-val">-</span>
-            </div>
-            <div class="info-box">
-                <span class="info-label">DESV. ESTÁNDAR (σ)</span>
-                <span id="sigmaVal" class="info-val">-</span>
-            </div>
-            <div class="info-box">
-                <span class="info-label">TOTAL MUESTRAS (N)</span>
-                <span id="nVal" class="info-val">-</span>
-            </div>
-            <div class="info-box">
-                <span class="info-label">ARCHIVOS PROCESADOS</span>
-                <span id="filesCount" class="info-val">-</span>
-            </div>
-        </div>
-
-        <button class="btn-primary" id="pdfBtn">Descargar Reporte PDF</button>
-    </div>
-</div>
-
-<script>
-    let currentData = {
-        cpk: 0, mean: 0, sigma: 0, n: 0, files: 0, usl: 0, lsl: 0, timestamp: ""
-    };
-
-    const folderInput = document.getElementById('folderInput');
-    const uploadText = document.getElementById('uploadText');
-
-    folderInput.addEventListener('change', async (e) => {
-        const files = Array.from(e.target.files).filter(f => f.name.endsWith('.log') || f.name.endsWith('.csv'));
-        
-        if (files.length === 0) {
-            alert("No se encontraron archivos .log o .csv en la carpeta.");
-            return;
-        }
-
-        uploadText.innerText = `Procesando ${files.length} archivos...`;
-        
-        let allNumbers = [];
-
-        for (const file of files) {
-            const text = await file.text();
-            // Regex para capturar números decimales (ej: 45.67)
-            const matches = text.match(/-?\d+\.\d+/g);
-            if (matches) {
-                allNumbers.push(...matches.map(Number));
+    <script>
+        let reportData = {};
+        document.getElementById('folderInput').addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files).filter(f => f.name.match(/\.(log|csv|txt)$/i));
+            if (!files.length) return alert("No hay archivos válidos");
+            
+            document.getElementById('txt').innerText = `Procesando ${files.length} archivos...`;
+            let data = [];
+            for (const f of files) {
+                const text = await f.text();
+                const matches = text.match(/-?\d+\.\d+/g);
+                if (matches) data.push(...matches.map(Number));
             }
-        }
 
-        if (allNumbers.length < 2) {
-            alert("No se extrajeron suficientes mediciones válidas.");
-            uploadText.innerText = "Seleccionar carpeta de Logs";
-            return;
-        }
+            const usl = parseFloat(document.getElementById('usl').value);
+            const lsl = parseFloat(document.getElementById('lsl').value);
+            const n = data.length;
+            const mean = data.reduce((a, b) => a + b, 0) / n;
+            const sigma = Math.sqrt(data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1));
+            const cpk = Math.min((usl - mean)/(3*sigma), (mean - lsl)/(3*sigma));
 
-        calculateStats(allNumbers, files.length);
-    });
-
-    function calculateStats(data, fileCount) {
-        const usl = parseFloat(document.getElementById('usl').value);
-        const lsl = parseFloat(document.getElementById('lsl').value);
-        const n = data.length;
-        const mean = data.reduce((a, b) => a + b, 0) / n;
-        const variance = data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1);
-        const sigma = Math.sqrt(variance);
-
-        const cpu = (usl - mean) / (3 * sigma);
-        const cpl = (mean - lsl) / (3 * sigma);
-        const cpk = Math.min(cpu, cpl);
-
-        // Guardar estado para el PDF
-        currentData = {
-            cpk: cpk.toFixed(4),
-            mean: mean.toFixed(4),
-            sigma: sigma.toFixed(4),
-            n: n,
-            files: fileCount,
-            usl: usl,
-            lsl: lsl,
-            timestamp: new Date().toLocaleString()
-        };
-
-        displayResults();
-    }
-
-    function displayResults() {
-        document.getElementById('resultsCard').style.display = 'block';
-        const display = document.getElementById('cpkDisplay');
-        const badge = document.getElementById('statusBadge');
-        
-        display.innerText = currentData.cpk;
-        document.getElementById('meanVal').innerText = currentData.mean;
-        document.getElementById('sigmaVal').innerText = currentData.sigma;
-        document.getElementById('nVal').innerText = currentData.n;
-        document.getElementById('filesCount').innerText = currentData.files;
-
-        if (currentData.cpk >= 1.33) {
-            display.style.color = 'var(--accent-green)';
-            badge.innerText = "Proceso Capaz";
-            badge.style.backgroundColor = 'rgba(48, 209, 88, 0.2)';
-            badge.style.color = 'var(--accent-green)';
-        } else {
-            display.style.color = 'var(--accent-red)';
-            badge.innerText = "Proceso No Capaz";
-            badge.style.backgroundColor = 'rgba(255, 69, 58, 0.2)';
-            badge.style.color = 'var(--accent-red)';
-        }
-        
-        uploadText.innerText = "Carpeta Procesada Correctamente";
-    }
-
-    document.getElementById('pdfBtn').addEventListener('click', () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Estilo PDF
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22);
-        doc.text("Reporte de Calidad Vitrox AXI", 20, 30);
-        
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(100);
-        doc.text(`Generado el: ${currentData.timestamp}`, 20, 40);
-
-        doc.autoTable({
-            startY: 50,
-            head: [['Métrica', 'Valor']],
-            body: [
-                ['Límite Inferior (LSL)', currentData.lsl],
-                ['Límite Superior (USL)', currentData.usl],
-                ['Total Archivos', currentData.files],
-                ['Total Muestras (N)', currentData.n],
-                ['Media Aritmética', currentData.mean],
-                ['Desviación Estándar', currentData.sigma],
-                ['Índice CPK', currentData.cpk],
-                ['Resultado', currentData.cpk >= 1.33 ? 'APROBADO' : 'RECHAZADO']
-            ],
-            theme: 'striped',
-            headStyles: { fillColor: [10, 132, 255] }
+            reportData = { cpk: cpk.toFixed(4), mean: mean.toFixed(4), sigma: sigma.toFixed(4), n, files: files.length, usl, lsl };
+            
+            document.getElementById('res').style.display = 'block';
+            document.getElementById('cpkDisp').innerText = reportData.cpk;
+            document.getElementById('cpkDisp').style.color = cpk >= 1.33 ? 'var(--green)' : 'var(--red)';
+            document.getElementById('m').innerText = reportData.mean;
+            document.getElementById('s').innerText = reportData.sigma;
+            document.getElementById('n').innerText = n;
+            document.getElementById('f').innerText = files.length;
+            document.getElementById('txt').innerText = "Carpeta Cargada";
         });
 
-        doc.save(`Reporte_CPK_Vitrox_${Date.now()}.pdf`);
-    });
-</script>
-
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Reporte Vitrox AXI", 20, 20);
+            doc.autoTable({
+                startY: 30,
+                body: [
+                    ["CPK", reportData.cpk], ["Media", reportData.mean], ["Sigma", reportData.sigma],
+                    ["LSL", reportData.lsl], ["USL", reportData.usl], ["Muestras", reportData.n]
+                ]
+            });
+            doc.save("Reporte_CPK.pdf");
+        }
+    </script>
 </body>
 </html>
-index-v2.html
-Mostrando index-v2.html.
